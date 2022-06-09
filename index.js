@@ -47,6 +47,11 @@ class Sprite {
         this.position.x += this.velocity.x
         this.position.y += this.velocity.y
 
+        if(this.position.x + this.width >= canvas.width) this.position.x -= this.velocity.x;
+        if(this.position.x - this.velocity.x <= 0) {
+            this.position.x += Math.abs(this.velocity.x % canvas.width);
+        }
+
         if(this.position.y + this.height + this.velocity.y >= canvas.height) {
             this.velocity.y = 0
         } else {
