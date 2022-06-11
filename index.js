@@ -8,60 +8,16 @@ canvas.height = 576
 c.fillRect(0,0, canvas.width, canvas.height)
 const gravity = 0.7
 const xspeed = 10
-class Sprite {
-    constructor({position, velocity, color = 'red', offset}) {
-        this.position = position
-        this.velocity = velocity
-        this.width = 50
-        this.height = 150
-        this.lastKey
-        this.attackBox = {
-            position: {
-                x: this.position.x,
-                y: this.position.y
-            },
-            width: 100,
-            height: 50,
-            offset: offset
-        }
-        this.color = color
-        this.isAttacking
-    }
-    draw() {
-        c.fillStyle = this.color
-        c.fillRect(this.position.x, this.position.y, this.width, this.height)
+const background = new Sprite({
+    position: {
+        x: 0,
+        y: 0
+    },
+    imageSrc: './imgs/background.png'
+})
 
-        // attack box yas
-        if (this.isAttacking) {
-            c.fillStyle = 'green'
-            c.fillRect(this.attackBox.position.x, 
-                this.attackBox.position.y, 
-                this.attackBox.width, 
-                this.attackBox.height)    
-            }
-        }
-    update() {
-        this.draw()
-        this.attackBox.position.x = this.position.x + this.attackBox.offset.x // the reason for  the offset is to change the player's attackboxes' locations and stuff based on the player
-        this.attackBox.position.y = this.position.y
-        this.position.x += this.velocity.x
-        this.position.y += this.velocity.y
 
-        if(this.position.y + this.height + this.velocity.y >= canvas.height) {
-            this.velocity.y = 0
-        } else {
-            this.velocity.y += gravity
-        }
-    }
-    attack() {
-        this.isAttacking = true
-        setTimeout(() => {
-            this.isAttacking = false
-        }, 100) //after 100 milliseconds automatically sets to false
-    }
-}
-
-const player = new Sprite({
+const player = new Fighter({
     position: {
         x: 0,
         y: 0
@@ -71,12 +27,12 @@ const player = new Sprite({
         y: 0
     },
     offset: {
-        x: 0,
+        x: -85,
         y: 0
     }
 })
 
-const enemy = new Sprite({
+const enemy = new Fighter({
     position: {
         x: 400,
         y: 100
@@ -87,7 +43,7 @@ const enemy = new Sprite({
     },
     color: 'blue',
     offset: {
-        x: -50,
+        x: -85,
         y: 0
     }
 })
@@ -121,6 +77,7 @@ function animate() {
     window.requestAnimationFrame(animate)
     c.fillStyle = 'black'
     c.fillRect(0, 0, canvas.width, canvas.height)
+    background.update()
     player.update()
     enemy.update()
 
@@ -170,7 +127,11 @@ window.addEventListener('keydown', (event) => {
             player.lastKey = 'a'
             break
         case 'w':
-            player.velocity.y = -20
+            if (player.jump == 0)
+                player.velocity.y = -15
+            else if (player.jump == 1)
+                player.velocity.y = -12
+            player.jump++
             break
         case ' ':
             player.attack()
@@ -185,7 +146,11 @@ window.addEventListener('keydown', (event) => {
             enemy.lastKey = 'ArrowLeft'
             break
         case 'ArrowUp':
-            enemy.velocity.y = -20
+            if (enemy.jump == 0)
+                enemy.velocity.y = -15
+            else if (enemy.jump == 1)
+                enemy.velocity.y = -12
+            enemy.jump++
             break
         case 'ArrowDown':
             enemy.attack()
@@ -203,7 +168,7 @@ window.addEventListener('keyup', (event) => {
             keys.a.pressed = false
             break
         // case 'w':
-        //     keys.w.pressed = false
+        //     player.jump = 0
         //     break
         // enemy keys
         case 'ArrowRight':
@@ -213,8 +178,7 @@ window.addEventListener('keyup', (event) => {
             keys.ArrowLeft.pressed = false
             break
         // case 'ArrowUp':
-        //     keys.ArrowUp.pressed = false
-        //     break
+        //     enemy.jump = 0
 
     }
 })
